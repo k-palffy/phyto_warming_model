@@ -112,7 +112,7 @@ for(scen in 1:4) {
                       N = 250, P = 17)
         times <- 1:(2*365)
         sim_phyto_random_9[[scen]][[envir]][[(rich-1)*100+com]] <-
-          as.data.frame(ode(statevar, times, growth_v2, pars, method = "ode45", hmin = 0.01))
+          as.data.frame(ode(statevar, times, com_growth, pars, method = "ode45", hmin = 0.01))
       }
     }
   }
@@ -281,7 +281,7 @@ for(scen in 1:4) {
                         N = 200, P = 12)
           times <- 1:(2*365)
           sim_phyto_variable10[[scen]][[envir]][[repl]][[(rich-1)*100+com]] <-
-            as.data.frame(ode(statevar, times, growth_v2, pars, method = "ode45", hmin = 0.01))
+            as.data.frame(ode(statevar, times, com_growth, pars, method = "ode45", hmin = 0.01))
         }
       }
     }
@@ -332,7 +332,7 @@ for(scen in 1:4) {
                         N = 200, P = 12)
           times <- 1:(2*365)
           sim_phyto_variable20[[scen]][[envir]][[repl]][[(rich-1)*100+com]] <-
-            as.data.frame(ode(statevar, times, growth_v2, pars, method = "ode45", hmin = 0.01))
+            as.data.frame(ode(statevar, times, com_growth, pars, method = "ode45", hmin = 0.01))
         }
       }
     }
@@ -383,7 +383,7 @@ for(scen in 1:4) {
                         N = 200, P = 12)
           times <- 1:(2*365)
           sim_phyto_variable30[[scen]][[envir]][[repl]][[(rich-1)*100+com]] <-
-            as.data.frame(ode(statevar, times, growth_v2, pars, method = "ode45", hmin = 0.01))
+            as.data.frame(ode(statevar, times, com_growth, pars, method = "ode45", hmin = 0.01))
         }
       }
     }
