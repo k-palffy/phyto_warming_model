@@ -6,14 +6,14 @@
 # using model parameters defined in growth_par
 monod_temp <- function(growth_par,nut1,nut2,temper,vflow) {
   
+  growth_par <- as.numeric(growth_par)
+  
   monod_1 <- nut1/(nut1+growth_par[6])
   monod_2 <- nut2/(nut2+growth_par[12])
-  
-  if(monod_1 <= monod_2) {
-    mu <- growth_par[1]*exp(growth_par[2]*temper)*monod_1-(growth_par[3]+growth_par[4]*exp(growth_par[5]*temper))
-  } else {
-    mu <- growth_par[7]*exp(growth_par[8]*temper)*monod_2-(growth_par[9]+growth_par[10]*exp(growth_par[11]*temper))
-  }
+
+  mu_1     <- growth_par[1]*exp(growth_par[2]*temper) * monod_1 - (growth_par[3]+growth_par[4]*exp(growth_par[5]*temper))
+  mu_2     <- growth_par[7]*exp(growth_par[8]*temper) * monod_2 - (growth_par[9]+growth_par[10]*exp(growth_par[11]*temper))
+  mu       <- min(mu_1, mu_2)
   
   if(mu < vflow-1) {
     mu <- vflow-1
