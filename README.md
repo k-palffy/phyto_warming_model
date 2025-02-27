@@ -6,11 +6,11 @@ Pálffy, K. & E. Smeti, 2024. Combined effect of warming, nutrients, and species
 
 List of files:
 
-**phyto_model_functions.R** - R code of model function definitions
+**phyto_model_functions.R** - R code of model function definitions  
 monod_temp(): determines species-specific growth rate as a function of temperature and nutrient (N,P) concentrations
 com_growth(): determines the temporal change in species abundances and nutrient concentrations
 
-**phyto_simulations.R** - R script for all simulations reported in the stufy.
+**phyto_simulations.R** - R script for all simulations reported in the study.  
 Note: Running the nested loops is computationally demanding, so the original script was executed in a cloud environment. For testing, it’s recommended to run a single simulation first.
 
 **species_parameters_N.csv** - data table containing species-level model parameter values for nitrogen-dependent growth (species in rows, parameters in columns)
