@@ -1,7 +1,8 @@
 ## **phyto_warming_model**
 #### *A repository for simulated phytoplankton community dynamics using a numerical model written in R*
 
-This repository contains R codes for a model describing the dependence of algal growth as a function of temperature and nutrient availability (Thomas et al. 2017) combined with a multispecies, multi-nutrient model (Roelke & Spatharis, 2015). The model code and the simulation script in this repository were used in the following [study](https://aslopubs.onlinelibrary.wiley.com/doi/10.1002/lno.12548):  
+This repository contains R codes for a model describing the dependence of algal growth as a function of temperature and nutrient availability (Thomas et al. 2017) combined with a multispecies, multi-nutrient model (Roelke & Spatharis, 2015). The model code and the simulation script in this repository were used in the following [study](https://aslopubs.onlinelibrary.wiley.com/doi/10.1002/lno.12548):
+
 Pálffy, K. & E. Smeti, 2024. Combined effect of warming, nutrients, and species pool size on the seasonal variability of phytoplankton composition: A modeling perspective. Limnology and Oceanography 69: 1056–1069.
 
 List of files:
