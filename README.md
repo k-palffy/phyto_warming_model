@@ -19,3 +19,5 @@ Note: Running the nested loops is computationally demanding, so the original scr
 **species_parameters_P.csv** - data table containing species-level model parameter values for phosphorus-dependent growth (species in rows, parameters in columns)
 
 **temperature_scenario.csv** - daily temperature values over a year, representing a temperature scenario (described in the study in detail)
+
+**Nutrient_uptake_analysis.R** - Additional analysis of the simulations outputs regarding nutrient uptake and compositional shifts (R script)
