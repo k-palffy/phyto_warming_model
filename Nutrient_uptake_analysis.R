@@ -934,3 +934,740 @@ for(lo in 1:9) {
   }
 }
 
+# (10) Differences in aggregated annual values compared to baseline scenario
+annual$N_uptake_efficiency_dif <- NA_real_
+annual$P_uptake_efficiency_dif <- NA_real_
+annual$mean_vol_weighted_rstar_N_dif <- NA_real_
+annual$mean_vol_weighted_rstar_P_dif <- NA_real_
+annual$net_growth_time_dif <- NA_real_
+
+for(lo in 1:9) {
+  for(com in 1:300) {
+    
+    temp <- annual[annual$num_scen == 1 &
+                     annual$nutrient_load == lo &
+                     annual$community == com,]
+    
+    annual$N_uptake_efficiency_dif[annual$nutrient_load == lo &
+                                     annual$community == com] <-
+      annual$N_uptake_efficiency[annual$nutrient_load == lo &
+                                   annual$community == com] - temp$N_uptake_efficiency
+    annual$P_uptake_efficiency_dif[annual$nutrient_load == lo &
+                                     annual$community == com] <-
+      annual$P_uptake_efficiency[annual$nutrient_load == lo &
+                                   annual$community == com] - temp$P_uptake_efficiency
+    
+    annual$mean_vol_weighted_rstar_N_dif[annual$nutrient_load == lo &
+                                           annual$community == com] <-
+      annual$mean_vol_weighted_rstar_N[annual$nutrient_load == lo &
+                                         annual$community == com] - temp$mean_vol_weighted_rstar_N
+    annual$mean_vol_weighted_rstar_P_dif[annual$nutrient_load == lo &
+                                           annual$community == com] <-
+      annual$mean_vol_weighted_rstar_P[annual$nutrient_load == lo &
+                                         annual$community == com] - temp$mean_vol_weighted_rstar_P
+    
+    annual$net_growth_time_dif[annual$nutrient_load == lo &
+                                 annual$community == com] <-
+      annual$net_growth_time[annual$nutrient_load == lo &
+                               annual$community == com] - temp$net_growth_time
+    
+    print(c(lo, com))
+  }
+}
+
+# (11) FIGURE 5
+# (a) Change in P uptake efficiency vs. mean dissimilarity from baseline
+plots <- list()
+plots[[1]] <- annual_new %>%
+  filter(num_scen == 4 & sp_number == 50 & NP_ratio > 16) %>%
+  ggplot(aes(x = mean_present_dissim, y = P_uptake_efficiency_dif,
+             color = NP_ratio, fill = NP_ratio, group = NP_ratio)) +
+  theme_bw() +
+  theme(panel.grid = element_blank(),
+        axis.title.x = element_blank(),
+        axis.title.y = element_text(size = 25, margin = margin(r = 10)),
+        axis.text.x = element_blank(),
+        axis.text.y = element_text(size = 20),
+        axis.line = element_blank(),
+        panel.border = element_rect(color = "black", linewidth = 0.75, fill = NA),
+        legend.title = element_text(size = 23, hjust = 0.5),
+        legend.text = element_text(size = 20),
+        legend.position = c(0.98, 0.98),
+        legend.justification = c(1, 1),
+        legend.background = element_rect(fill = "white", color = "black", linewidth = 0.5)) +
+  geom_point(shape = 16, size = 4) +
+  geom_smooth(span = 1, alpha = 0.2) +
+  labs(color = "N/P ratio", fill = "N/P ratio",
+       y = expression(
+         atop(
+           paste("Increase in ", eta[italic(P)]),
+           "compared to baseline scenario"
+         )
+       )) +
+  scale_color_gradient2(low = "lawngreen", mid = "skyblue4", high = "navyblue",
+                        midpoint = 45) +
+  scale_fill_gradient2(low = "lawngreen", mid = "skyblue4", high = "navyblue",
+                       midpoint = 45)
+
+plots[[2]] <- annual_new %>%
+  filter(num_scen == 4 & sp_number == 50 & NP_ratio > 16) %>%
+  ggplot(aes(x = mean_present_dissim, y = mean_vol_weighted_rstar_P_dif,
+             color = net_growth_time_dif)) +
+  theme_bw() +
+  theme(panel.grid = element_blank(),
+        axis.title.x = element_text(size = 25, margin = margin(t = 10)),
+        axis.title.y = element_text(size = 25, margin = margin(r = 10)),
+        axis.text = element_text(size = 20),
+        axis.line = element_blank(),
+        panel.border = element_rect(color = "black", linewidth = 0.75, fill = NA),
+        legend.position = c(0.02,0.98),
+        legend.justification = c(0, 1),
+        legend.title = element_text(size = 23, hjust = 0.5),
+        legend.title.position = "left",
+        legend.text = element_text(size = 20),
+        legend.background = element_rect(fill = "white", color = "black", linewidth = 0.5)) +
+  geom_point(shape = 16, size = 4) +
+  labs(color = expression(
+    atop(
+      paste("Change in ", italic(t["g"])),
+      "(days)"
+    )
+  ),
+  x = expression(atop("Bray-Curtis dissimilarity",
+                      "from baseline scenario")),
+  y = expression(atop(paste("Change in weighted ",italic("R*"["P"])),
+                      "compared to baseline scenario"))) +
+  scale_color_gradient2(low = "lawngreen", mid = "skyblue4", high = "navyblue",
+                        midpoint = 45) +
+  scale_fill_gradient2(low = "lawngreen", mid = "skyblue4", high = "navyblue",
+                       midpoint = 45) +
+  geom_hline(yintercept = 0, linetype = "dashed",
+             color = "red4", linewidth = 1, alpha = 0.5)
+
+main_plot <- wrap_plots(plots, nrow = 2, ncol = 1) &
+  theme(plot.margin = margin(4, 4, 8, 4))
+
+plot_grid(main_plot)
+
+# (II) FLUCTUATING LOAD SIMULATIONS
+# Code used to compute all variables was the same as above.
+# Fluctuating conditions consisted of the following nutrient load level x nutrient load fluctuation combinations:
+# 3 different nutrient load levels: low, medium, high
+# fluctuation with 3 different frequencies: nutrient load changing every 30, 20, and 10 days
+# FIGURES 6 and 7 show results from the analysis of fluctuating load simulations
+
+# FIGURE 6
+# annual_var: data frame containing all variables computed from fluctuating load simulation outputs
+# structurally similar to data frame 'annual'
+annual_var$var_load <- interaction(annual_var$load, annual_var$variability, sep = " ")
+
+annual_var$variability <- factor(annual_var$variability,
+                                 levels = c("Constant","30 days","20 days","10 days"))
+annual_var$load <- factor(annual_var$load,
+                          levels = c("Low","Medium","High"))
+
+p1 <- annual_var[annual_var$sp_number == 50 &
+                   annual_var$num_scen == 4,] %>%
+  ggplot(aes(x = interaction(load, variability, sep = "\n"),
+             y = P_uptake_efficiency_dif,
+             fill = load)) +
+  theme_bw() +
+  theme(
+    panel.grid = element_blank(),
+    legend.position = "top",
+    legend.text = element_text(size = 25),
+    legend.title = element_text(size = 30, margin = margin(r = 20)),
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.title.y = element_text(size = 30, margin = margin(r = 5)),
+    axis.text = element_text(size = 22)
+  ) +
+  geom_boxplot(outliers= FALSE, alpha = 0.75) +
+  labs(y = expression(atop(paste("Change in ",eta[italic(P)]),
+                           "compared to baseline scenario")),
+       fill = "Load level") +
+  scale_fill_manual(values = c("Low" = "darkolivegreen1",
+                               "Medium" = "darkolivegreen4",
+                               "High" = "darkgreen")) +
+  geom_hline(yintercept = 0, linetype = "dashed",
+             color = "red4", linewidth = 1, alpha = 0.5) +
+  geom_vline(xintercept = c(3.5,6.5,9.5),
+             linetype = "dotted",
+             color = "grey65", linewidth = 1) +
+  annotate("text", x = c(2,5,8,11), y = 0.44, size = 10,
+           label = c("Constant", "30 days", "20 days","10 days"))
+
+p2 <- annual_var[annual_var$sp_number == 50 &
+                   annual_var$num_scen == 4,] %>%
+  ggplot(aes(x = interaction(load, variability, sep = "\n"),
+             y = N_uptake_efficiency_dif,
+             fill = load)) +
+  theme_bw() +
+  theme(
+    panel.grid = element_blank(),
+    legend.position = "none",
+    axis.title.x = element_text(size = 30, margin = margin(t = 20)),
+    axis.title.y = element_text(size = 30, margin = margin(r = 5)),
+    axis.text = element_text(size = 22)
+  ) +
+  geom_boxplot(outliers = FALSE, alpha = 0.75) +
+  labs(x = "Load level-variability combination",
+       y = expression(atop(paste("Change in ",eta[italic(N)]),
+                           "compared to baseline scenario"))) +
+  scale_fill_manual(values = c("Low" = "darkolivegreen1",
+                               "Medium" = "darkolivegreen4",
+                               "High" = "darkgreen")) +
+  geom_hline(yintercept = 0, linetype = "dashed",
+             color = "red4", linewidth = 1, alpha = 0.5) +
+  geom_vline(xintercept = c(3.5,6.5,9.5),
+             linetype = "dotted",
+             color = "grey65", linewidth = 1) +
+  scale_x_discrete(labels = rep(c("Low", "Medium", "High"), times = 4))
+
+p1 / p2
+
+# FIGURE 7
+colnames(annual_var)[match(c("mean_present_dissim",
+                             "N_uptake_efficiency_dif","P_uptake_efficiency_dif",
+                             "mean_vol_weighted_rstar_N_dif",
+                             "mean_vol_weighted_rstar_P_dif",
+                             "positive_growth_days_dif"),colnames(annual_var))] <-
+  c("Dissimilarity","N uptake eff.","P uptake eff.",
+    "R*-N","R*-P","Growth_days")
+
+pca_data <- annual_var %>%
+  filter(num_scen == 4 & sp_number == 50 &
+           load %in% c("low","high") & variability %in% c("constant","10 days")) %>%
+  select(load,variability,Dissimilarity,
+         'N uptake eff.','P uptake eff.',
+         'R*-N','R*-P','Growth_days')
+
+pca_data <- pca_data[!is.na(pca_data$Dissimilarity), ]
+
+colnames(pca_data)[4:8] <- c("eta[italic(N)]",
+                             "eta[italic(P)]",
+                             "R*\"*\"[N]",
+                             "R*\"*\"[P]",
+                             "italic(t[g])")
+
+# Principal component analysis
+pca_result <- prcomp(pca_data[c("Dissimilarity",
+                                'eta[italic(N)]',
+                                'eta[italic(P)]',
+                                "R*\"*\"[N]",
+                                "R*\"*\"[P]",
+                                'italic(t[g])')], scale. = TRUE)
+
+pca_data$load <- as.factor(pca_data$load)
+pca_data$variability <- as.factor(pca_data$variability)
+levels(pca_data$load) <- c("High","Low")
+levels(pca_data$variability)[2] <- "Constant"
+pca_data$group <- interaction(pca_data$load, pca_data$variability, sep = " level - ")
+
+group_cols <- c("Low level - Constant"  = "olivedrab3",
+                "Low level - 10 days"   = "steelblue1",
+                "High level - Constant" = "darkgreen",
+                "High level - 10 days"  = "dodgerblue4")
+
+# Raw PCA biplot
+p <- fviz_pca_biplot(pca_result,
+                     repel = TRUE,
+                     col.var = "black",
+                     geom.var = "none",
+                     geom.ind = "point",
+                     habillage = pca_data$group,
+                     pointsize = 3,
+                     addEllipses = TRUE,
+                     ellipse.level = 0.95,
+                     ellipse.alpha = 0.3,
+                     parse = TRUE)
+
+scores <- as.data.frame(pca_result$x)
+loadings <- as.data.frame(pca_result$rotation)
+
+# Compute scaling factor
+scale_factor <- min(
+  (max(scores$PC1) - min(scores$PC1)) / (max(loadings$PC1) - min(loadings$PC1)),
+  (max(scores$PC2) - min(scores$PC2)) / (max(loadings$PC2) - min(loadings$PC2))
+) * 0.7
+
+loadings$label_x <- loadings$PC1 * scale_factor
+loadings$label_y <- loadings$PC2 * scale_factor
+loadings$var <- rownames(loadings)
+loadings$label_y[loadings$var %in% c("Dissimilarity",
+                                     "eta[italic(N)]",
+                                     "eta[italic(P)]",
+                                     "R*\"*\"[N]",
+                                     "R*\"*\"[P]",
+                                     "italic(t[g])")] <-
+  loadings$label_y[loadings$var %in% c("Dissimilarity",
+                                       "eta[italic(N)]",
+                                       "eta[italic(P)]",
+                                       "R*\"*\"[N]",
+                                       "R*\"*\"[P]",
+                                       "italic(t[g])")] + c(0.2,0.2,-0.1,0.3,0.2,0.2)
+
+loadings$label_x[loadings$var %in% c("Dissimilarity",
+                                     "eta[italic(N)]",
+                                     "eta[italic(P)]",
+                                     "R*\"*\"[N]",
+                                     "R*\"*\"[P]",
+                                     "italic(t[g])")] <-
+  loadings$label_x[loadings$var %in% c("Dissimilarity",
+                                       "eta[italic(N)]",
+                                       "eta[italic(P)]",
+                                       "R*\"*\"[N]",
+                                       "R*\"*\"[P]",
+                                       "italic(t[g])")] + c(-0.3,0.1,0.2,-0.3,0.1,0)
+
+p + geom_segment(data = loadings,
+                 aes(x = 0, y = 0,
+                     xend = PC1 * scale_factor,
+                     yend = PC2 * scale_factor),
+                 arrow = arrow(length = unit(0.3, "cm"),
+                               type = "closed"),
+                 color = "black",
+                 linewidth = 0.7) +
+  geom_text(data = loadings,
+            aes(x = label_x, y = label_y, label = var),
+            size = 8,
+            parse = TRUE) +
+  scale_color_manual(values = group_cols) +
+  scale_fill_manual(values = group_cols) +
+  scale_shape_manual(values = rep(16, length(group_cols))) +
+  labs(color = "Nutrient load", fill = "Nutrient load", shape = "Nutrient load") +
+  theme(panel.grid = element_blank(),
+        panel.border = element_rect(color = "black"),
+        title = element_blank(),
+        axis.title = element_text(size = 20),
+        axis.text= element_text(size = 15),
+        legend.title = element_text(size = 20),
+        legend.text = element_text(size = 20),
+        legend.position = c(0.02,0.02),
+        legend.justification = c(0,0),
+        legend.key.spacing.y = unit(0.1, "cm"),
+        legend.background = element_rect(fill = "white", color = "black", linewidth = 0.5))
+
+# (III) STATISTICAL ANALYSIS
+# Testing the effects on nutrient uptake efficiency as response variable
+# (III/1) Generalized additive mixed models (GAMM) for constant load simulations
+load("/Local_path/Sim_Output_Table.RData")
+
+# 1. Variables
+independent_vars_N <- c(
+  "NP_ratio",
+  "num_scen",
+  "sp_number",
+  "mean_vol_weighted_rstar_N",
+  "positive_growth_days"
+)
+
+independent_vars_P <- c(
+  "NP_ratio",
+  "num_scen",
+  "sp_number",
+  "mean_vol_weighted_rstar_P",
+  "positive_growth_days"
+)
+
+annual_scaled <- annual %>%
+  select(all_of(c(independent_vars_N,independent_vars_P))) %>%
+  scale() %>%
+  as.data.frame()
+annual_scaled <- cbind(
+  annual_scaled,
+  annual %>%
+    select(N_uptake_efficiency, P_uptake_efficiency)
+)
+
+# 2. Variance structures
+variance_structures <- list(
+  none          = NULL,
+  varPower      = list(form = ~ fitted(.)),
+  varExp        = list(form = ~ fitted(.)),
+  varConstPower = list(form = ~ fitted(.))
+)
+
+# 3. Function for building variance structure
+make_var_struct <- function(var_name, var_info){
+  
+  if (is.null(var_info)) return(NULL)
+  
+  get(var_name, asNamespace("nlme"))(
+    form = var_info$form
+  )
+}
+
+# 4. Formulas
+generate_gamm_formula <- function(response, vars){
+  
+  terms <- c()
+  
+  for(v in vars){
+    
+    if(v=="NP_ratio"){
+      terms <- c(terms, "s(NP_ratio,k=5)")
+    } else {
+      terms <- c(terms, v)
+    }
+  }
+  
+  as.formula(
+    paste(response, "~", paste(terms, collapse=" + "))
+  )
+}
+
+# 5. Model fitting function
+fit_models <- function(data, response, predictors){
+  
+  results <- list()
+  
+  gamm_formula <- generate_gamm_formula(response, predictors)
+  
+  for(var_name in names(variance_structures)){
+    
+    tryCatch({
+      
+      var_struct <- make_var_struct(
+        var_name,
+        variance_structures[[var_name]]
+      )
+      
+      if(is.null(var_struct)){
+        
+        fit <- mgcv::gamm(
+          formula = gamm_formula,
+          data = data,
+          family = gaussian(),
+          method = "ML"
+        )
+        
+      } else {
+        
+        fit <- mgcv::gamm(
+          formula = gamm_formula,
+          data = data,
+          family = gaussian(),
+          weights = var_struct,
+          method = "ML"
+        )
+      }
+      
+      results[[paste0("GAMM_",var_name)]] <- data.frame(
+        model = paste0("GAMM_",var_name),
+        type = "GAMM",
+        variance = var_name,
+        AIC = AIC(fit$lme),
+        BIC = BIC(fit$lme),
+        logLik = as.numeric(logLik(fit$lme))
+      )
+      
+    }, error=function(e){
+      
+      cat("GAMM failed:",var_name,"\n")
+      cat(conditionMessage(e),"\n\n")
+      
+    })
+  }
+  
+  out <- do.call(rbind, results)
+  out <- out[order(out$AIC), ]
+  rownames(out) <- NULL
+  
+  return(out)
+}
+
+# 6. Model fitting
+results_N <- fit_models(
+  annual_new_scaled,
+  "N_uptake_efficiency",
+  independent_vars_N
+)
+
+results_P <- fit_models(
+  annual_new_scaled,
+  "P_uptake_efficiency",
+  independent_vars_P
+)
+
+# 7. Results
+results_N
+results_P
+
+# 8. Best model fits
+best_N <- mgcv::gamm(
+  formula =
+    N_uptake_efficiency ~
+    s(NP_ratio, k = 5) +
+    num_scen +
+    sp_number +
+    mean_vol_weighted_rstar_N +
+    positive_growth_days,
+  weights = varPower(form = ~ fitted(.)),
+  data = annual_new_scaled,
+  family = gaussian(),
+  method = "ML"
+)
+
+best_P <- mgcv::gamm(
+  formula =
+    P_uptake_efficiency ~
+    s(NP_ratio, k = 5) +
+    num_scen +
+    sp_number +
+    mean_vol_weighted_rstar_P +
+    positive_growth_days,
+  weights = varConstPower(form = ~ fitted(.)),
+  data = annual_new_scaled,
+  family = gaussian(),
+  method = "ML"
+)
+
+summary(best_N$gam)
+summary(best_P$gam)
+
+summary(best_N$gam)$p.table
+summary(best_P$gam)$p.table
+summary(best_N$gam)$s.table
+summary(best_P$gam)$s.table
+AIC(best_N$lme)
+AIC(best_P$lme)
+summary(best_N$gam)$r.sq
+summary(best_P$gam)$r.sq
+
+# (III/2) Generalized least squares models (GLS) for fluctuating load simulations
+load("/Local_path/Varload_annual_values.RData")
+
+# 1. Variables
+annual_var$fluctuation <- 1
+annual_var$fluctuation[annual_var$variability == "constant"] <- 0
+
+lookup <- c(
+  "constant" = 1,
+  "30 days" = 2,
+  "20 days" = 3,
+  "10 days" = 4
+)
+
+annual_var$variability_num <- lookup[annual_var$variability]
+
+lookup <- c(
+  "low" = 1,
+  "medium" = 2,
+  "high" = 3
+)
+
+annual_var$load_num <- lookup[annual_var$load]
+
+independent_vars_N <- c(
+  "load_num",
+  "num_scen",
+  "mean_vol_weighted_rstar_N"
+)
+
+independent_vars_P <- c(
+  "load_num",
+  "num_scen",
+  "mean_vol_weighted_rstar_P"
+)
+
+annual_var_scaled <- annual_var %>%
+  filter(sp_number == 50) %>%
+  select(all_of(c(independent_vars_N,independent_vars_P))) %>%
+  scale() %>%
+  as.data.frame()
+annual_var_scaled <- cbind(
+  annual_var_scaled,
+  annual_var %>%
+    filter(sp_number == 50) %>%
+    select(fluctuation, N_uptake_efficiency, P_uptake_efficiency)
+)
+
+independent_vars_N <- c("fluctuation", independent_vars_N)
+independent_vars_P <- c("fluctuation", independent_vars_P)
+
+# 2. Formulas
+generate_gls_formula <- function(response, vars){
+  
+  as.formula(
+    paste(response, "~", paste(vars, collapse=" + "))
+  )
+}
+
+# 3. Model fitting function
+fit_models <- function(data, response, predictors){
+  
+  results <- list()
+  
+  gls_formula  <- generate_gls_formula(response, predictors)
+  
+  for(var_name in names(variance_structures)){
+    
+    tryCatch({
+      
+      var_struct <- make_var_struct(
+        var_name,
+        variance_structures[[var_name]]
+      )
+      
+      if(is.null(var_struct)){
+        
+        fit <- nlme::gls(
+          model = gls_formula,
+          data = data,
+          method = "ML",
+          na.action = na.omit,
+          control = glsControl(
+            maxIter=300,
+            msMaxIter=500
+          )
+        )
+        
+      } else {
+        
+        fit <- nlme::gls(
+          model = gls_formula,
+          data = data,
+          weights = var_struct,
+          method = "ML",
+          na.action = na.omit,
+          control = glsControl(
+            maxIter=300,
+            msMaxIter=500
+          )
+        )
+      }
+      
+      results[[paste0("GLS_",var_name)]] <- data.frame(
+        model = paste0("GLS_",var_name),
+        type = "GLS",
+        variance = var_name,
+        AIC = AIC(fit),
+        BIC = BIC(fit),
+        logLik = as.numeric(logLik(fit))
+      )
+      
+    }, error=function(e){
+      
+      cat("GLS failed:",var_name,"\n")
+      cat(conditionMessage(e),"\n\n")
+      
+    })
+  }
+  
+  out <- do.call(rbind, results)
+  
+  out <- out[order(out$AIC), ]
+  
+  rownames(out) <- NULL
+  
+  return(out)
+}
+
+# 4. Model fitting
+results_N <- fit_models(
+  annual_var_scaled,
+  "N_uptake_efficiency",
+  independent_vars_N
+)
+
+results_P <- fit_models(
+  annual_var_scaled,
+  "P_uptake_efficiency",
+  independent_vars_P
+)
+
+# 5. Results
+results_N
+results_P
+
+# 6. Best model fits
+best_N <- nlme::gls(
+  model =
+    N_uptake_efficiency ~
+    fluctuation +
+    load_num +
+    num_scen +
+    mean_vol_weighted_rstar_N,
+  weights = varPower(form = ~ fitted(.)),
+  data = annual_var_scaled,
+  method = "ML",
+  na.action = na.omit,
+  control = glsControl(
+    maxIter=300,
+    msMaxIter=500
+  )
+)
+
+best_P <- nlme::gls(
+  model =
+    P_uptake_efficiency ~
+    fluctuation +
+    load_num +
+    num_scen +
+    mean_vol_weighted_rstar_P,
+  weights = varExp(form = ~ fitted(.)),
+  data = annual_var_scaled,
+  method = "ML",
+  na.action = na.omit,
+  control = glsControl(
+    maxIter=300,
+    msMaxIter=500
+  )
+)
+
+summary(best_N)
+summary(best_P)
+
+# (III/2b) Adding interaction terms
+best_N2 <- nlme::gls(
+  model =
+    N_uptake_efficiency ~
+    fluctuation +
+    load_num +
+    num_scen +
+    mean_vol_weighted_rstar_N +
+    load_num:num_scen +
+    fluctuation:load_num +
+    fluctuation:num_scen,
+  weights = varPower(form = ~ fitted(.)),
+  data = annual_var_scaled,
+  method = "ML",
+  na.action = na.omit,
+  control = glsControl(
+    maxIter=300,
+    msMaxIter=500
+  )
+)
+
+best_P2 <- nlme::gls(
+  model =
+    P_uptake_efficiency ~
+    fluctuation +
+    load_num +
+    num_scen +
+    mean_vol_weighted_rstar_P +
+    load_num:num_scen +
+    fluctuation:load_num +
+    fluctuation:num_scen,
+  weights = varExp(form = ~ fitted(.)),
+  data = annual_var_scaled,
+  method = "ML",
+  na.action = na.omit,
+  control = glsControl(
+    maxIter=300,
+    msMaxIter=500
+  )
+)
+
+AIC(best_N,best_N2)
+AIC(best_P,best_P2)
+summary(best_N2)
+summary(best_P2)
+
+# RMSE
+rmse_N2 <- sqrt(mean(residuals(best_N2)^2))
+rmse_P2 <- sqrt(mean(residuals(best_P2)^2))
+rmse_N2
+rmse_P2
